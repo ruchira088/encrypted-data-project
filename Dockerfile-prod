@@ -1,0 +1,7 @@
+FROM openjdk:11-jre-slim
+
+WORKDIR /opt/encrypted-data-project
+
+ADD target/universal/encrypted-data-project-*.tgz .
+
+CMD [ "/opt/encrypted-data-project/bin/encrypted-data-project" ]
