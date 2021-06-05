@@ -10,7 +10,9 @@ object Dependencies
 
   lazy val catsEffect = "org.typelevel" %% "cats-effect" % "2.5.1"
 
-  lazy val doobieCore = "org.tpolecat" %% "doobie-core" % "0.9.4"
+  lazy val doobieCore = "org.tpolecat" %% "doobie-core" % "0.13.4"
+
+  lazy val doobieHikari = "org.tpolecat" %% "doobie-hikari" % "0.13.4"
 
   lazy val jodaTime = "joda-time" % "joda-time" % "2.10.10"
 

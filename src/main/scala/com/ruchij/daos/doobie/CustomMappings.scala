@@ -1,7 +1,7 @@
-package com.ruchij.daos.dao
+package com.ruchij.daos.doobie
 
-import com.ruchij.daos.dao.models.EncryptedField
-import com.ruchij.daos.dao.models.EncryptedField.InitializationVector
+import com.ruchij.daos.doobie.models.EncryptedField
+import com.ruchij.daos.doobie.models.EncryptedField.InitializationVector
 import doobie.implicits.javasql.TimestampMeta
 import doobie.util.{Get, Put}
 import org.joda.time.DateTime

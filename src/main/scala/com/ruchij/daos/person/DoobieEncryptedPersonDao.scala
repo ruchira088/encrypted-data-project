@@ -1,8 +1,8 @@
 package com.ruchij.daos.person
 
-import com.ruchij.daos.dao.CustomMappings._
-import com.ruchij.daos.dao.models.EncryptedField
-import com.ruchij.daos.dao.models.EncryptedField.InitializationVector
+import com.ruchij.daos.doobie.CustomMappings._
+import com.ruchij.daos.doobie.models.EncryptedField
+import com.ruchij.daos.doobie.models.EncryptedField.InitializationVector
 import com.ruchij.daos.person.models.EncryptedPerson
 import doobie.ConnectionIO
 import doobie.implicits.toSqlInterpolator
@@ -34,4 +34,7 @@ object DoobieEncryptedPersonDao extends EncryptedPersonDao[ConnectionIO] {
 
   override def findById(id: UUID): ConnectionIO[Option[EncryptedPerson]] =
     (SelectQuery ++ fr"WHERE id = $id").query[EncryptedPerson].option
+
+  override def retrieveAll(offset: Int, pageSize: Int): ConnectionIO[List[EncryptedPerson]] =
+    (SelectQuery ++ fr"LIMIT $pageSize OFFSET ${offset * pageSize}").query[EncryptedPerson].to[List]
 }

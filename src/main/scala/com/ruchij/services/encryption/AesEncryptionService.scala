@@ -2,9 +2,9 @@ package com.ruchij.services.encryption
 
 import cats.effect.{Blocker, ContextShift, Sync}
 import cats.implicits._
-import com.ruchij.daos.dao.models.EncryptedField
-import com.ruchij.daos.dao.models.EncryptedField.InitializationVector
-import com.ruchij.daos.dao.models.EncryptedField.InitializationVector.DefaultIV
+import com.ruchij.daos.doobie.models.EncryptedField
+import com.ruchij.daos.doobie.models.EncryptedField.InitializationVector
+import com.ruchij.daos.doobie.models.EncryptedField.InitializationVector.DefaultIV
 import com.ruchij.services.encryption.AesEncryptionService.Algorithm
 import com.ruchij.services.encryption.models.{ByteDecoder, ByteEncoder}
 
@@ -13,8 +13,8 @@ import javax.crypto.{Cipher, SecretKey}
 
 class AesEncryptionService[F[_]: Sync: ContextShift](
   secretKey: SecretKey,
-  cpuBlocker: Blocker,
-  defaultIV: IvParameterSpec
+  defaultIV: IvParameterSpec,
+  cpuBlocker: Blocker
 ) extends EncryptionService[F] {
 
   val ivLength: Int = defaultIV.getIV.length

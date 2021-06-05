@@ -32,7 +32,7 @@ lazy val migration =
     )
 
 lazy val rootDependencies =
-  Seq(catsEffect, jodaTime, doobieCore, faker, h2, postgresql, pureconfig)
+  Seq(catsEffect, jodaTime, doobieCore, doobieHikari, faker, h2, postgresql, pureconfig)
 
 lazy val rootTestDependencies =
   Seq(scalaTest, pegdown)
