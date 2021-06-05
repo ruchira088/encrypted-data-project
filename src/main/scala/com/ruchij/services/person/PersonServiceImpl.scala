@@ -1,13 +1,12 @@
 package com.ruchij.services.person
 
-import cats.{Monad, MonadError, ~>}
 import cats.effect.Clock
 import cats.implicits._
-import com.ruchij.daos.models.EncryptedField.InitializationVector.{DefaultIV, RandomIV}
+import cats.{Applicative, Monad, MonadError, ~>}
+import com.ruchij.daos.dao.models.EncryptedField.InitializationVector.{DefaultIV, RandomIV}
 import com.ruchij.daos.person.EncryptedPersonDao
 import com.ruchij.daos.person.models.EncryptedPerson
 import com.ruchij.services.encryption.EncryptionService
-import com.ruchij.services.encryption.models.{ByteDecoder, ByteEncoder}
 import com.ruchij.services.person.model.Person
 import com.ruchij.types.FunctionKTypes._
 import com.ruchij.types.Random
@@ -16,7 +15,7 @@ import org.joda.time.DateTime
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
-class PersonServiceImpl[F[+ _]: Clock: Random[*[_], UUID]: MonadError[*[_], Throwable]: ByteEncoder[*[_], String]: ByteDecoder[*[_], String], G[_]: Monad](
+class PersonServiceImpl[F[_]: Clock: Random[*[_], UUID]: MonadError[*[_], Throwable], G[_]: Monad](
   encryptionService: EncryptionService[F],
   encryptedPersonDao: EncryptedPersonDao[G]
 )(implicit transaction: G ~> F) extends PersonService[F] {
@@ -35,7 +34,7 @@ class PersonServiceImpl[F[+ _]: Clock: Random[*[_], UUID]: MonadError[*[_], Thro
       encryptedPerson =
         EncryptedPerson(id, timestamp, timestamp, usernameEncrypted, firstNameEncrypted, lastNameEncrypted, emailEncrypted)
 
-      maybePerson <-
+      maybeEncryptedPerson <-
         transaction {
           encryptedPersonDao.insert(encryptedPerson)
             .productR {
@@ -44,13 +43,23 @@ class PersonServiceImpl[F[+ _]: Clock: Random[*[_], UUID]: MonadError[*[_], Thro
         }
 
       encryptedPerson <-
-        maybePerson.toG[F](optionToF[Throwable, F](new InternalError("Unable to persist person")))
+        maybeEncryptedPerson.toG[F](optionToF[Throwable, F](new InternalError("Unable to persist person")))
 
       person <- decrypt(encryptedPerson)
 
     } yield person
 
-  override def findByEmail(email: String): F[Option[Person]] = ???
+  override def findByEmail(email: String): F[Option[Person]] =
+    for {
+      encryptedEmail <- encryptionService.encrypt(email, DefaultIV)
+      maybeEncryptedPerson <- transaction(encryptedPersonDao.findByEmail(encryptedEmail))
+
+      maybePerson <-
+        maybeEncryptedPerson.fold[F[Option[Person]]](Applicative[F].pure(None)) {
+          encryptedPerson => decrypt(encryptedPerson).map(Some.apply)
+        }
+    }
+    yield maybePerson
 
   private def decrypt(encryptedPerson: EncryptedPerson): F[Person] =
     for {

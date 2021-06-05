@@ -1,6 +1,6 @@
-package com.ruchij.daos.models
+package com.ruchij.daos.dao.models
 
-import com.ruchij.daos.models.EncryptedField.InitializationVector
+import com.ruchij.daos.dao.models.EncryptedField.InitializationVector
 
 case class EncryptedField[A, B <: InitializationVector](data: Array[Byte])
 

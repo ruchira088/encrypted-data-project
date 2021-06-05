@@ -1,7 +1,7 @@
 package com.ruchij.daos.person.models
 
-import com.ruchij.daos.models.EncryptedField
-import com.ruchij.daos.models.EncryptedField.InitializationVector.{DefaultIV, RandomIV}
+import com.ruchij.daos.dao.models.EncryptedField
+import com.ruchij.daos.dao.models.EncryptedField.InitializationVector.{DefaultIV, RandomIV}
 import org.joda.time.DateTime
 
 import java.util.UUID
