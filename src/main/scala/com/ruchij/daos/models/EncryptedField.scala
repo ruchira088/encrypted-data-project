@@ -8,10 +8,7 @@ object EncryptedField {
   sealed trait InitializationVector
 
   object InitializationVector {
-    case object DefaultIV extends InitializationVector {
-      val data: Array[Byte] = Array()
-    }
-
+    case object DefaultIV extends InitializationVector
     case object RandomIV extends InitializationVector
   }
 }
