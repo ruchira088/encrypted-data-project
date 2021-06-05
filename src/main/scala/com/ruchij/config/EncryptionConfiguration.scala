@@ -1,6 +1,5 @@
 package com.ruchij.config
 
-import javax.crypto.SecretKey
-import javax.crypto.spec.IvParameterSpec
+import javax.crypto.spec.{IvParameterSpec, SecretKeySpec}
 
-case class EncryptionConfiguration(secretKey: SecretKey, defaultIV: IvParameterSpec)
+case class EncryptionConfiguration(secretKey: SecretKeySpec, defaultIV: IvParameterSpec)

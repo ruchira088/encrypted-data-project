@@ -15,7 +15,7 @@ object DoobieEncryptedPersonDao extends EncryptedPersonDao[ConnectionIO] {
 
   override def insert(encryptedPerson: EncryptedPerson): ConnectionIO[Int] =
     sql"""
-        INSERT INTO person (id, created_at modified_at, username, first_name, last_name, email)
+        INSERT INTO person (id, created_at, modified_at, username, first_name, last_name, email)
             VALUES (
                 ${encryptedPerson.id},
                 ${encryptedPerson.createdAt},

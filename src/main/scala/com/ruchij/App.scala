@@ -5,6 +5,7 @@ import cats.implicits._
 import com.ruchij.config.ApplicationConfiguration
 import com.ruchij.daos.doobie.Transactor
 import com.ruchij.daos.person.DoobieEncryptedPersonDao
+import com.ruchij.migration.MigrationApp
 import com.ruchij.services.encryption.AesEncryptionService
 import com.ruchij.services.person.{PersonService, PersonServiceImpl}
 import com.ruchij.types.Random
@@ -67,6 +68,8 @@ object App extends IOApp {
       .map(_.trans)
       .flatMap { implicit transaction =>
         for {
+          _ <- Resource.eval(MigrationApp.migrate(applicationConfiguration.database))
+
           cpuCount <- Resource.eval(Sync[F].delay(Runtime.getRuntime.availableProcessors()))
           cpuThreadPool <- Resource.eval(Sync[F].delay(Executors.newFixedThreadPool(cpuCount)))
           cpuBlocker = Blocker.liftExecutionContext(ExecutionContext.fromExecutor(cpuThreadPool))
