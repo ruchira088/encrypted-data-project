@@ -12,4 +12,7 @@ case class Person(
   firstName: String,
   lastName: String,
   email: String
-)
+) {
+  override def toString: String =
+    s"Person(id=$id, createdAt=$createdAt, modifiedAt=$modifiedAt, username=$username, firstName=$firstName, lastName=$lastName, email=$email)"
+}

@@ -28,11 +28,11 @@ lazy val migration =
   (project in file("./migration"))
     .settings(
       name := "migration-application",
-      libraryDependencies ++= Seq(catsEffect, flyway, h2, postgresql, pureconfig)
+      libraryDependencies ++= Seq(catsEffect, flyway, h2, postgresql, pureconfig, logback)
     )
 
 lazy val rootDependencies =
-  Seq(catsEffect, jodaTime, doobieCore, doobieHikari, faker, h2, postgresql, pureconfig)
+  Seq(catsEffect, jodaTime, doobieCore, doobieHikari, faker, h2, postgresql, pureconfig, logback, log4cats)
 
 lazy val rootTestDependencies =
   Seq(scalaTest, pegdown)

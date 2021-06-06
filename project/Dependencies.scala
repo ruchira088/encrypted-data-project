@@ -26,6 +26,10 @@ object Dependencies
 
   lazy val flyway = "org.flywaydb" % "flyway-core" % "7.9.2"
 
+  lazy val logback = "ch.qos.logback" % "logback-classic" % "1.2.3"
+
+  lazy val log4cats =  "org.typelevel" %% "log4cats-slf4j" % "1.3.1"
+
   lazy val scalaTest = "org.scalatest" %% "scalatest" % "3.2.9"
 
   lazy val pegdown = "org.pegdown" % "pegdown" % "1.6.0"

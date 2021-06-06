@@ -11,6 +11,8 @@ import com.ruchij.services.person.{PersonService, PersonServiceImpl}
 import com.ruchij.types.Random
 import doobie.ConnectionIO
 import fs2.Stream
+import org.typelevel.log4cats.Logger
+import org.typelevel.log4cats.slf4j.Slf4jLogger
 import pureconfig.ConfigSource
 
 import java.util.concurrent.Executors
@@ -20,15 +22,20 @@ object App extends IOApp {
   case class PersonEntry(firstName: String, lastName: String, email: String)
 
   override def run(args: List[String]): IO[ExitCode] =
-    for {
-      configObjectSource <- IO.delay(ConfigSource.defaultApplication)
-      applicationConfiguration <- ApplicationConfiguration.load[IO](configObjectSource)
+    Slf4jLogger.create[IO].flatMap { implicit logger =>
+      for {
+        configObjectSource <- IO.delay(ConfigSource.defaultApplication)
+        applicationConfiguration <- ApplicationConfiguration.load[IO](configObjectSource)
 
-      _ <- personService[IO](applicationConfiguration).use(execute[IO])
-      _ <- IO.delay(println("Application execution completed"))
-    } yield ExitCode.Success
+        _ <- personService[IO](applicationConfiguration).use { service =>
+          execute[IO](service, applicationConfiguration.data.insertionCount)
+        }
 
-  def execute[F[_]: Sync](personService: PersonService[F]): F[Unit] =
+        _ <- Logger[IO].info("Application execution completed")
+      } yield ExitCode.Success
+    }
+
+  def execute[F[_]: Sync: Logger](personService: PersonService[F], insertionCount: Int): F[Unit] =
     Stream
       .eval(Random[F, PersonEntry].generate)
       .repeat
@@ -36,20 +43,20 @@ object App extends IOApp {
         personService
           .create(personEntry.firstName, personEntry.lastName, personEntry.email)
           .flatMap { person =>
-            personService.findByEmail(person.email)
-          }
-          .flatMap {
-            case Some(person) => Sync[F].delay(println(person))
-            case _ => Sync[F].delay(println("Error"))
+            personService
+              .findByEmail(person.email)
+              .flatMap {
+                case Some(retrievePerson) => Logger[F].info(retrievePerson.toString)
+
+                case _ => Logger[F].error(s"Unable to find persisted person: $person")
+              }
           }
       }
-      .take(10)
+      .take(insertionCount)
       .compile
       .drain
       .productR {
-        Sync[F].delay {
-          println("---------------------- Listing all the saved entries ----------------------")
-        }
+        Logger[F].info("---------------------- Listing all the saved entries ----------------------")
       }
       .productR {
         personService.retrieveAll
