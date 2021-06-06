@@ -61,7 +61,7 @@ object App extends IOApp {
       .productR {
         personService.retrieveAll
           .evalMap { person =>
-            Sync[F].delay(println(person))
+            Logger[F].info(person.toString)
           }
           .compile
           .drain

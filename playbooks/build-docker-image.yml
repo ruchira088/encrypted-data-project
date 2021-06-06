@@ -7,7 +7,7 @@
       shell: cd ../ && sbt universal:packageZipTarball
 
     - name: Build production Docker image
-      shell: cd ../ && docker build -t encrypted-data-project:latest -f Dockerfile-prod .
+      shell: docker build -t encrypted-data-project:latest -f ../Dockerfile-prod ../
 
     - name: Print finish message
       debug:

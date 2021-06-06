@@ -36,5 +36,5 @@ object DoobieEncryptedPersonDao extends EncryptedPersonDao[ConnectionIO] {
     (SelectQuery ++ fr"WHERE id = $id").query[EncryptedPerson].option
 
   override def retrieveAll(offset: Int, pageSize: Int): ConnectionIO[List[EncryptedPerson]] =
-    (SelectQuery ++ fr"LIMIT $pageSize OFFSET ${offset * pageSize}").query[EncryptedPerson].to[List]
+    (SelectQuery ++ fr"ORDER BY created_at LIMIT $pageSize OFFSET $offset").query[EncryptedPerson].to[List]
 }

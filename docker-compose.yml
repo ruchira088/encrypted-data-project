@@ -3,15 +3,24 @@ version: "3"
 services:
 
   encrypted-data-project:
-    build: .
+    image: encrypted-data-project:latest
+    depends_on:
+      postgresql-database:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: "jdbc:postgresql://postgresql-database:5432/encrypted-data"
+      DATABASE_USER: "admin"
+      DATABASE_PASSWORD: "password"
+
+  postgresql-database:
+    image: postgres
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U admin -d encrypted-data" ]
+      interval: 5s
+      timeout: 4s
     ports:
-      - 5005:5005
-    volumes:
-      - "~/.sbt:/root/.sbt"
-      - "~/Library/Caches/Coursier:/root/.cache/coursier" # MacOS Coursier cache
-#      - "~/.cache/coursier:/root/.cache/coursier" # Linux Coursier cache
-#      - "~/AppData/Local/Coursier/Cache:/root/.cache/coursier" # Windows Coursier cache
-      - ".:/opt/encrypted-data-project"
-      - "/opt/encrypted-data-project/target"
-      - "/opt/encrypted-data-project/project/target"
-      - "/root/.sbt/1.0/plugins"
+      - 5432:5432
+    environment:
+      POSTGRES_DB: "encrypted-data"
+      POSTGRES_USER: "admin"
+      POSTGRES_PASSWORD: "password"
